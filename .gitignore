@@ -1,0 +1,28 @@
+# Secrets — never commit these
+.env
+*.env
+config.env
+config.yaml
+.restic_pw
+cerberus.conf
+admin_auth.yaml
+*.secret
+*.key
+*.pem
+*.p12
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+.next/
+
+# Logs
+*.log
+
+# OS
+.DS_Store

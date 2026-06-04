@@ -1,0 +1,52 @@
+# CT 101 — argenta-dev (192.168.18.114 / Tailscale 100.72.74.116)
+# PostgreSQL 16 + pgAdmin for the Argenta personal finance app
+# Spring Boot backend and React frontend are managed via PM2 (not Docker)
+# Frontend exposed via: tailscale serve https / --bg (argenta-dev.tail9d9dc4.ts.net)
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: argenta-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - argenta_network
+    mem_limit: 512m
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: argenta-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - argenta_network
+    mem_limit: 512m
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  argenta_network:
+    driver: bridge
